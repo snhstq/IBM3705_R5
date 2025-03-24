@@ -59,13 +59,37 @@ All these makes should end without any issues.
 After a make, the executable is stored in the BIN directory.
 
 component 1 is madatory (duh...)
-The other components are optional, however, you must at least choose one of the components 2, 3 or 4. 
+The other components are optional, however, you must at least choose one of the components 2, 3 or 4.   
 
+Below picture shows the high-level architecture with all components.  
 ![High Level architecture of the 3705 emulator](/Images/Overview.png)
 
    
 
 ### Preparing the MVS system
+This section is generic. It applies to a CPIPO build of MVS, TK5 or whatever other ways the MVS system has been created.    
+Copy file ‘ncpssp.3350’ fro the 3705 emulator package ‘Hercules Files’ directory to your Hercules/hyperion dasd folder.
+
+Update the Hercules cnf file  and add ncpssp.3350 to the dasd configuration.
+Be sure to select an address that is generated as a 3350.
+For TK5 the address range 240-24F are 3350’s.  Below 244 is used.
+...
+
+0244 3350 dasd/ncpssp.3350         <=== Added
+...
+
+Now add the 3705 to the configuration file. Again, use an address that is generated as a 3705.
+For TK5 this is 660. Make sure to comment out the existing definition for device 660. For TK5 the updates should be made to tk5_default.cnf:  
+\#  
+\# NCP VTAM  
+\#  
+0660 3705 adaptip=192.168.1.05 port=37051  <=== Added. 192.168.1.05 should be replaced with the IP address of the host running your 3705.   
+\#0660 3705 lport=${N660PORT:=37051} locncpnm=N07 rmtncpnm=N08 unitsz=252 ackspeed=1000  
+0661 3705 lport=${N661PORT:=37052} locncpnm=N10 rmtncpnm=N11 idblk=017 idnum=00018 locsuba=10 rmtsuba=11 unitsz=252 ackspeed=1000  
+0662 3705 lport=${N662PORT:=37053} locncpnm=N12 rmtncpnm=N13 idblk=017 idnum=00019 locsuba=12 rmtsuba=13 unitsz=252 ackspeed=1000  
+0663 3705 lport=${N663PORT:=37054} locncpnm=N14 rmtncpnm=N15 idblk=017 idnum=0001a locsuba=14 rmtsuba=15 unitsz=252 ackspeed=1000  
+\#  
+
 
 ## Future updates:
 	
