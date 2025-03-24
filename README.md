@@ -1,5 +1,5 @@
 # IBM3705_R5
-
+## Release Notes
 The main updates with Release 5 of the IBM 3705 SIMH emulator:
 
 1. Remote 3705:  
@@ -21,12 +21,57 @@ The main updates with Release 5 of the IBM 3705 SIMH emulator:
 6.  Issue Fixes: 
 	Various issues have ben resolved, including the annoying issue with i3274  whereby a logon was no longer possible after a logoff.
 	
- 	
-Future updates:
+## Installation
+### Environments
+The 3705 emulator has been tested against the following:   
+- Linux for RPi Debian Buster, Bullseye and Bookworm
+- Linux for Intel  Debian Bookworm
+- gcc version 8.3.0 up to  version 12.2.0
+- Hercules version 3.13 and most Hyperion releases up to version 4.6
+- Aethra
+- MVS3.8j CBIPO install 
+- TK4
+- TK5
+- SIMH 3.11-0
+- X3270
+
+### Installing the 3705 emulator
+#### Preparing the Linux environment
+The 3705 emulator should run on any Linux environment.  Howver, testing has onlly be done on Raspberry Pi and Intel.
+The following packages are required: 
+1. apt-get install git gcc make 
+2. apt-get install libncurses-dev
+3. apt-get install libbsd-dev
+
+Download the 3705 emulator package from GitHub:    
+git clone https://github.com/snhstq/IBM3705_R5.git
+For building the 3705 emulator go to directory IBM3705_R5  
+
+The package comes with the following components:  
+1. i3705	This is the actual 3705 emulator. 	**Build instruction: make i3705** 
+2. i3274	The 3274 PU type 2 emulator (SDLC). 	**Build instruction: make i3274**
+3. i3271	The 3271 cluster emulator (BSC). 	**Build instruction: make i3271**
+4. DLSw		Data Link Switch (SDLC).		**Build instruction: make DLSw**
+5. Trunk	Interconnection between two 3705's.	**Build instruction: make Trunk**
+6. CPanel	The 3705 Control panel.			**Build instruction: make CPanel**
+
+All these makes should end without any issues.
+After a make, the executable is stored in the BIN directory.
+
+component 1 is madatory (duh...)
+The other components are optional, however, you must at least choose one of the components 2, 3 or 4. 
+
+
+
+   
+
+### Preparing the MVS system
+
+## Future updates:
 	
-    Performance improvements
-	V24 (DB25) to USB interface
-	Windows version
+Performance improvements  
+V24 (DB25) to USB interface  
+Windows version  
 
 
 EF & HJS (C)2025
