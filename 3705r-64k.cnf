@@ -1,0 +1,5 @@
+set cpu 64k
+;
+; d debug ff
+deposit CAdisable 1
+b cpu 
