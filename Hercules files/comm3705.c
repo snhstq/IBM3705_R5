@@ -31,12 +31,16 @@
 #include "parser.h"
 
 
-#if defined(WIN32)
-   typedef int bool;
-   #define true 1
-   #define false 0
-#else
-   #include "stdbool.h"
+//#if !defined(WIN32)
+//   #include "stdbool.h"
+//#endif
+
+#if !defined(true)
+#define true 1
+#endif
+
+#if !defined(false)
+#define false 0
 #endif
 
 #if defined(WIN32) && defined(OPTION_DYNAMIC_LOAD) && !defined(HDL_USE_LIBTOOL) && !defined(_MSVC_)
@@ -186,7 +190,7 @@ static int write_adpt(BYTE* bufferp, int len, COMMADPT* ca);
 // ************************************************************
 // Function to check if socket is (still) connected
 // ************************************************************
-static bool IsSocketConnected(int sockfd, U16 ssid, U16 devnum)
+static int IsSocketConnected(int sockfd, U16 ssid, U16 devnum)
 {
    int rc;
    struct sockaddr_in ccu_addr;
