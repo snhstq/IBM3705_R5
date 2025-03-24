@@ -78,7 +78,7 @@ For TK5 the address range 240-24F are 3350’s.  Below 244 is used.
 0244 3350 dasd/ncpssp.3350         <=== Added
 ...
 
-Now add the 3705 to the configuration file. Again, use an address that is generated as a 3705.
+Now add the 3705 to the hercules configuration file. Make sure to use an address that is generated as a 3705.
 For TK5 this is 660. Make sure to comment out the existing definition for device 660. For TK5 the updates should be made to tk5_default.cnf:  
 \#  
 \# NCP VTAM  
@@ -89,6 +89,44 @@ For TK5 this is 660. Make sure to comment out the existing definition for device
 0662 3705 lport=${N662PORT:=37053} locncpnm=N12 rmtncpnm=N13 idblk=017 idnum=00019 locsuba=12 rmtsuba=13 unitsz=252 ackspeed=1000  
 0663 3705 lport=${N663PORT:=37054} locncpnm=N14 rmtncpnm=N15 idblk=017 idnum=0001a locsuba=14 rmtsuba=15 unitsz=252 ackspeed=1000  
 \#  
+
+Below table gives an overview of the IP port usage by the 3705:
+| 37005 Channel Adapter | Channel Switch | IP Poert |
+| --------------------- | -------------- | ---------|
+|           1           |   A position   |   37501  |
+|           1           |   B position   |   37503  |
+|           2           |   A position   |   37504  |
+|           3           |   B position   |   37505  |
+
+
+The MVS system can now be IPL'ed.  
+### Catalog datasets
+First catalog the following datasets which are on volume NCPSSP:  
+- SYS1.GEN3705     
+- SYS1.MAC3705     
+- SYS1.NCPOBJ1      
+- SYS1.NCPSAMP      
+- SYS1.NCPSTG1    
+- SYS1.OBJ3705      
+- SYS1.SSPLIB
+
+  SYS1.NCPLOAD is also on volume NCPSSP, but no longer used. So it does not have to be cataloged.
+   
+### Update SYS1.PARMLIB
+Make updates to the following SYS1.PARMLIB members. xx is to be replaced with the suffix of the member used during IPL.  
+- LNKLSTxx : Add SYS1.SSPLIB
+- VATLSTxx : Add  NCPSSP,0,2,3350	,N 
+
+### Replace IFLOADRN (TK4, TK5)  
+The IFLOADN used by TK amd TK5 is a special version for loading fake IBM 3705’s.  
+
+Restore the original IFLOADRN of IBM or, in case it does not exist:  
+Copy ‘SYS1.SSPLIB(IFLOADRN)’ on NCPSSP to ‘SYS1.LINKLIB(IFLOADRN)’ on the sysres volume.  
+
+Note: the old IFLOADRN version is now not avail anymore.
+
+Shutdown MVS and Re-IPL MVS with all these updates.
+
 
 
 ## Future updates:
