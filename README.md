@@ -153,7 +153,7 @@ The sim prompt reappears. Now enter:
 sim> c   
 
 The LIB panel should now appear: 
-![LIB panel](/Images/LIBP_anel.png)
+![LIB panel](/Images/LIB Panel.png)
 
 ### DLSw
 With DLSw you can connect a real SDLC device to i3705. You will need a real DLSw router to which the SDLC device is connected.  
