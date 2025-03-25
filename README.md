@@ -412,8 +412,39 @@ BIN/i3274 -cchn efoxcc1 -line 20 -fdx
 
 In the “old days” Full Duplex would mean a significant performance gain as transmit and receive occurs simultaneously on the line set. The use of TCP/IP connections for the 3705 emulator greatly obsoletes the benefits of full duplex. However, on a Trunk line (See section [Trunk](#trunk)) there is certainly some performance gain.     
 
+## Remote 3705
+Running a remote 3705 involves the following:  
+- a local (channel attached) 3705
+- a remote 3705, which is a 3705 with both channel adapters disabled
+- a Trunk line connection the above mentioned 3705's
+
+SYS1.NCPSAMP on NCPSSP contains sample NCP's:
+- N16B which is theNCP for the channel attached 3705
+- N17B which is the NCP for the remote 3705
+
+Copy both members to SYS1.VTAMLST
+Follow the steps outlined in xxxx to generated both NCP's.
+
+Start the local 3705
+./BIN/i3705 I3705/3705-128k.cnf 
+
+Start the remote 3705
+./BIN/i3705 I3705/3705r-128k.cnf       
+Note the addition "r" in the nanme of the config file.
 
 
+
+```
+CPU: MEMORYSIZE 128K bytes   
+PNL: LOAD pressed, rebooting....
+CPU: Disabling CA1
+CPU: Disabling CA2
+CPU: checking CA1: status = -1 
+CPU: checking CA2: status = -1 
+CPU: Booting 3705 from diskette... 
+CPU: Loading LPG1 at X'00400'
+CPU: Loading LPG2 at X'1E000'
+```
 ## Future updates:
 	
 Performance improvements  
