@@ -96,9 +96,17 @@ Below table gives an overview of the IP port usage by the 3705:
 |           1           |   A position   |   37501  |
 |           1           |   B position   |   37503  |
 |           2           |   A position   |   37504  |
-|           3           |   B position   |   37505  |
+|           2           |   B position   |   37505  |
 
 
+The 3705 can handle 2 channel adapters, each consisting of two cannels "A" and "B".    
+On a MVS3.8 system, with VTAM L2 and the NCP version supplied on volume NCPSSP, only 1 channel can be active at any one time.  
+The "B" channel of the 1st channel adapter was intended as a backup in case  the "A" channel failed.   
+The 2nd channel adapter was intended to be used as a connection to a backup host system. Like with the 1st channel adapter, the "B" channel was the backup for the "A" channel.  
+Higher version of VTAM and NCP provide multi-channel support. When these are used, the 3705 emulator can connect to two hosts (Channel adapteer 1 to one host, the 2nd adapter to the other).    
+
+
+ 
 The MVS system can now be IPL'ed.  
 ### Catalog datasets
 First catalog the following datasets which are on volume NCPSSP:  
