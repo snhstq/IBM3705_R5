@@ -135,6 +135,61 @@ Note: the old IFLOADRN version is now not avail anymore.
 
 Shutdown MVS and Re-IPL MVS with all these updates.
 
+## Operation and Use
+### DLSw
+With DLSw you can connect a real SDLC device to i3705. You will need a real DLSw router to which the SDLC device is connected.  
+
+The Data Link Switch (DLSw) emulator connects to the real DLSw router and to a line of the 3705 emulator.  
+The real DLSw route needs to be configured properly. The config parameters relevant to the DLSw connection are (for a Cisco 2800 router):  
+| Configuration Parameter | Description |
+|--------------------------------------|-------------------------------------------|
+| dlsw local-peer peer-id 192.168.2.91 | This is the IP address of the DLSw router |
+| dlsw remote-peer 0 tcp 192.168.2.72  | This is the ip address of the host running the DLSw emulator |
+| interface FastEthernet0/0 | Ethernet interface to be used |
+| ip address 192.168.2.91 255.255.255.0 | IP address and netmask of the ethernet interface |
+| interface Serial0/0/0  | Serial interface to which the SDLC device is attached |
+| encapsulation sdlc | SDLC frame encapsulation |
+| clock rate 9600| Baud rate between the DSLw router |
+| sdlc role primary| DLSw router plays role of primary SDLC device |
+| sdlc vmac 4000.0999.0100 | Arbitrary (virtual) MAC address associated with the SDLC device. It is not used.|
+| sdlc address C1 | Address of SDLC PU connected to the DLSw router |
+| sdlc xid C1 01700018 | XID of the SDLC PU. Must match VTAM switched node definition. |
+| sdlc partner 4000.1020.1000 | The MAC address of the 3705. Not used. |
+| sdlc dlsw C1	| Enable DLSw for this SDLC address. |
+
+
+
+
+Starting DLSw:  
+
+BIN/DLSw -peerip 192.168.2.91 -cchn efoxcc2 -line 20   
+
+This connects DLSw to line 20 of the i3705 on host efoxcc2 and it connects to a real DLSw route which has ip address 192.168.2.91   
+
+Instead of a hostname, an IP address can be specified with switch -cchip.  
+
+When all goes well the following messages appear:  
+
+DLSw: Connection to be established with peer DLSw at ip address 192.168.2.91  
+DLSw: Connection to be established with SLDC line at 3705 on host efoxcc2  
+DLSw: Connection to be established with SDLC line 20
+DLSw: state DISCONNECTED  
+DLSw: Waiting for SDLC line connection to be established  
+DLSw: DLSw ready, waiting for connection on TCP port 2065  
+DLSw: Waiting for DLSw peer outbound connection to be established  
+DLSw: Outbound connection to peer has been established  
+DLSw: SDLC line connection has been established  
+DLSw: Inbound connection from peer DLSw at 192.168.2.91  
+DLSw: state CIRCUIT_START  
+DLSw: state CIRCUIT_START  
+DLSw: state CIRCUIT_ESTABISHED  
+DLSw: state CONNECT_PENDING  
+DLSw: state CONNECTED  
+
+
+The key message is the last one: “state CONNECTED” this means the end-to-end connectivity is established and the DLSw’s and the SDLC device are ready. Once in the “Connected” state, the DLSw emulator will respond to a Request to Send (RTS) from the 3705 scanner with a “Clear To Send” (CTS). In effect, the connected state will allow the 3705 to send data across the line and DLSw’s to the SDLC device. 
+
+DLSw can be terminated with “Ctrl C”.
 
 
 ## Future updates:
