@@ -136,6 +136,13 @@ Note: the old IFLOADRN version is now not avail anymore.
 Shutdown MVS and Re-IPL MVS with all these updates.
 
 ## Operation and Use
+### 3705 Control Panel
+Open a new X-terminal(on the same system that was used to start the 3705 Emulator). And go to directory SIMH_3705_R5.   
+To start the Control Panel, enter: BIN/CPanel
+
+The 3705 control panel should now appear:
+
+
 ### LIB panel
 The Line Interface Base (LIB) is the one place where all lines connect to.Each stand-alone emulator (3271,3274, DLSw, Trunk) has the -line switch as a mandatory start parameter to identify the line to which the connection should be made. Node that this line number must correspond to the line number in the NCP definition for the device being connected.   
 
@@ -152,8 +159,15 @@ The sim prompt reappears. Now enter:
 
 sim> c   
 
-The LIB panel should now appear: 
-![LIB panel](/Images/LIB Panel.png)
+The LIB panel should now appear:   
+![LIB panel](/Images/LIBpanel.png)    
+  
+The LIB panel is dynamically build based on the number of lines defined in the 3705 (Default is 4).  
+The above display shows Line 20, connected, active to VTAM and in session (RTS is high).  
+Line 21 is active for VTAM (DTR high), but not connected. Therefore, this must be a switched line.  
+Line 22 shows connected (DSR and RI), but not active for VTAM.  
+Line 23 is not connected and not active for VTAM.  
+
 
 ### DLSw
 With DLSw you can connect a real SDLC device to i3705. You will need a real DLSw router to which the SDLC device is connected.  
