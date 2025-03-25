@@ -66,7 +66,45 @@ Below picture shows the high-level architecture with all components.
 
 
 ### starting the 3705
-   
+The 3705 may be started before of after Hercules is started. The (TCP/IP) channel conection is made as soon as both ends are available. As such, the 3705 can be stopped and started at any point without the need to restart Hercules.
+Th 3705 is started from directory SIMH_3705_R5 with the command:
+
+./BIN/i3705 3705-128k.cnf 
+
+3705-128k.cnf is the configuration file for a 128k channel attached 3705. Other config files available are: 3705-64k.cnf (64K 3705) and 3705-256k.cnf (256K 3705).  
+Similary, there are 3 configuration files for a remote 3705: 3705r-64k.cnf, 3705r-128k.cnf and 3705r-256k.cnf. 
+
+After the start command the following messages appear:
+```
+CS-T2: Thread 21095 started succesfully...
+CS-T2: Scanner initialized with 4 lines...
+CA-T2: Main thread 21094 started succesfully...
+PNL: Thread 21096 started succesfully... 
+LIB: Thread 21097 started succesfully...
+CA: Adapter thread 21093 started sucessfully... 
+CA1: Waiting for channel connection on TCP port 37051 
+CA2: Waiting for channel connection on TCP port 37053 
+LIB: Using TCP network Address 192.168.2.71 on eth0 for 327x connections
+LIB: Line-0 ready, waiting for connection on TCP port 37520
+LIB: Line-1 ready, waiting for connection on TCP port 37521
+LIB: Line-2 ready, waiting for connection on TCP port 37522
+LIB: Line-3 ready, waiting for connection on TCP port 37523
+CPU: Reset... 
+CPU: MEMORYSIZE 256K bytes 
+
+IBM 3705 II simulator V3.11-0
+CPU: Reset... 
+CPU: MEMORYSIZE 128K bytes 
+CPU: checking CA1: status = 0 
+CPU: CA1  enabled
+CPU: Loading MaxiROS at X'00000'
+CA1: New bus connection on 3705 port 37051, socket fd is 20, ip is : 192.168.2.16, port : 49879 
+CA1: New tag connection on 3705 port 37051, socket fd is 21, ip is : 192.168.2.16, port : 49880 
+CA1: Connected to device 0660
+```
+The last message indicates a succesful connection to Hercules device 660.   
+The 3705 is now ready to be loaded with an NCP.   
+
 
 ### Preparing the MVS system
 This section is generic. It applies to a CPIPO build of MVS, TK5 or whatever other ways the MVS system has been created.    
@@ -426,17 +464,33 @@ Copy both members to SYS1.VTAMLST
 Follow the steps outlined in xxxx to generated both NCP's.
 
 Start the local 3705
-./BIN/i3705 I3705/3705-128k.cnf 
+./BIN/i3705 3705-128k.cnf 
 
 Start the remote 3705
-./BIN/i3705 I3705/3705r-128k.cnf       
+./BIN/i3705 3705r-128k.cnf       
 Note the addition "r" in the nanme of the config file.
-
-
+For the remote 3705 the following messages appear:
 
 ```
-CPU: MEMORYSIZE 128K bytes   
-PNL: LOAD pressed, rebooting....
+CA-T2: Main thread 161535 started succesfully...
+CS-T2: Thread 161536 started succesfully...
+CS-T2: Scanner initialized with 4 lines...
+CA1: Waiting for channel connection on TCP port 37051 
+CA2: Waiting for channel connection on TCP port 37053 
+LIB: Thread 161539 started succesfully...
+CA: Adapter thread 161534 started sucessfully... 
+PNL: Thread 161537 started succesfully... 
+LIB: Using TCP network Address 192.168.2.41 on eno1 for 327x connections
+LIB: Line-0 ready, waiting for connection on TCP port 37520
+LIB: Line-1 ready, waiting for connection on TCP port 37521
+LIB: Line-2 ready, waiting for connection on TCP port 37522
+LIB: Line-3 ready, waiting for connection on TCP port 37523
+CPU: Reset... 
+CPU: MEMORYSIZE 256K bytes 
+
+IBM 3705 II simulator V3.11-0
+CPU: Reset... 
+CPU: MEMORYSIZE 128K bytes 
 CPU: Disabling CA1
 CPU: Disabling CA2
 CPU: checking CA1: status = -1 
@@ -444,7 +498,41 @@ CPU: checking CA2: status = -1
 CPU: Booting 3705 from diskette... 
 CPU: Loading LPG1 at X'00400'
 CPU: Loading LPG2 at X'1E000'
+CA1: Channel connection A closed
+CA2: Channel connection A closed
 ```
+The 3705 boots from diskette and closes the channel connections (i.e. the channels are beig disabled). Next step is to start the Trunk line:  
+
+BIN/Trunk -cchn1 efoxcc1 -cchn2 efox41 -line1 20 -line2 20 -fdx 
+
+```
+Trunk: Connection to be established with line-1 at 3705 on host efoxcc1
+Trunk: Connection to be established with line-2 at 3705 on host efox41
+Trunk: Connection to be established with line-1 20
+Trunk: Connection to be established with line-2 20
+Trunk: Full Duplex mode
+Trunk: Line 1 connection has been established
+Trunk: Line 2 connection has been established
+```
+The trunk line is now established between the 3705 running on host efoxcc1 and the 3705 running on host efoxcc2. Both 3705's use line 20 (this must be specified in the NCP as well).  Note the -fdx switch. Thisis FUll Duplex, which is mandatory for a connection to the remote 3705 (This is how we configured the loader program).    
+
+The 3705 is now ready to be loaded over an SDLC line. 
+
+First load the local 3705:
+
+V NET,ACT,iD=N16B
+
+After message.....issue
+
+V NET,ACT,ID=N17B
+This start the NCP load over the SDLC line. Note that this will take substantial longer than loading the local 3705.
+
+
+
+
+
+
+
 ## Future updates:
 	
 Performance improvements  
