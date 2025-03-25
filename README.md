@@ -165,6 +165,50 @@ Shutdown MVS and Re-IPL MVS with all these updates.
 
 ### Generating and loading the NCP
 
+
+Load the generated NCP into the IBM 3705  
+
+  -           v net,act,id=N16A                                           
+    STC  439  IST097I  VARY     ACCEPTED
+    STC  439  IST197I  SAVED CONFIGURATION N16A  READ FROM VTAMOBJ        
+  - STC  439  IEC130I INITEST  DD STATEMENT MISSING                          
+    STC  439  IST270I  370X N16A  NOW LOADED WITH LOADMOD N16A         
+    STC  439  IST093I  N16A  ACTIVE                                       
+                                    
+Activation of the SDLC PU and LU:
+v net,act,id=P16A20A 
+v net,act,id=T16A20A1  
+v net,act,id=T16A20A2 (for the 2nd LU).
+
+Activation of the BSC cluster and Terminal:  
+v net,act,id=P16A23A  
+v net,act,id=T16A23A1  
+
+
+                                           
+
+ v net,act,id=sdlcpa01,logon=tso,logmode=mhp3278e
+     (this will activates the LU with the proper logmode and 
+      starts the TSO session).
+ 
+Connect your TN3270 client to the EMU3705 IP address 192.168.1.5 port 32001.
+
+Note: during testing we discovered that quick3270 does not work with the tn3270 server in the 3271/3274.  X3270 works perfect.
+
+   ...                     
+   ..                      
+   Connected to device 000
+
+Press
+   [RESET]
+   [CLEAR]
+   [RESET]
+
+Type: ‘logon applid(tso) logmode(mhp3278e)’ and press [SYS-REQ] (not [ENTER]!)
+
+Wait for the TSO login prompt and login:
+
+
 ## Operation and Use
 ### 3705 Control Panel
 Open a new X-terminal(on the same system that was used to start the 3705 Emulator). And go to directory SIMH_3705_R5.   
