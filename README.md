@@ -64,6 +64,8 @@ The other components are optional, however, you must at least choose one of the 
 Below picture shows the high-level architecture with all components.  
 ![High Level architecture of the 3705 emulator](/Images/Overview.png)
 
+
+### starting the 3705
    
 
 ### Preparing the MVS system
@@ -90,6 +92,14 @@ For TK5 this is 660. Make sure to comment out the existing definition for device
 0663 3705 lport=${N663PORT:=37054} locncpnm=N14 rmtncpnm=N15 idblk=017 idnum=0001a locsuba=14 rmtsuba=15 unitsz=252 ackspeed=1000  
 \#  
 
+Note: comm3705 will always display informational (CCxxxnnI) and error (CCxxxnnE) messages. When debug=yes is specified in the above configuration statement for device 660,  all Debug (CCxxxnnD) messages will be displayed too.  
+Adding tracesna=yes in will display the translated SNA command’s that are sent/received.  
+With standard Hercules command ‘t+ cua’ (e.g. t+ 660) you can activate the CCW trace and ‘t- 660’ will disabled it again.   
+
+Adding tracesna=yes in de Hercules ‘conf/tk4-default’ file will display the translated SNA command’s that are sent/received.
+
+
+
 Below table gives an overview of the IP port usage by the 3705:
 | 37005 Channel Adapter | Channel Switch | IP Poert |
 | --------------------- | -------------- | ---------|
@@ -105,7 +115,25 @@ The "B" channel of the 1st channel adapter was intended as a backup in case  the
 The 2nd channel adapter was intended to be used as a connection to a backup host system. Like with the 1st channel adapter, the "B" channel was the backup for the "A" channel.  
 Higher version of VTAM and NCP provide multi-channel support. When these are used, the 3705 emulator can connect to two hosts (Channel adapteer 1 to one host, the 2nd adapter to the other).    
 
+### Starting Hercules
+After the config changes have been made to Hercules, it can be started. You will see the following messages on the Hercules screen:  
+CCTAG002D 1:0660: Preparing connection with remote channel adapter  
+CCBUS019I 1:0660: Waiting for bus(49) connection to be established  
+CCBUS019I 1:0660: Waiting for tag(50) connection to be established  
+CCTAG003I 1:0660: tag connection established on socket 50  
+CCBUS003I 1:0660: bus connection established on socket 49  
+CCTAG019I 1:0660: connections on port 37051; Bus socket: 49, Tag socket: 50  
 
+### IPL MVS
+IPL MVS. After IPL completion 
+Check that the 3705 device address is online in MVS:  
+
+ d u,,,660,1                                                   
+ IEE450I 09.34.55 UNIT STATUS         FRAME LAST         F      E     1A    
+ UNIT TYPE STATUS  VOLSER VOLSTATE                                          
+ 660  3705 O                                                                
+
+  
  
 The MVS system can now be IPL'ed.  
 ### Catalog datasets
@@ -123,7 +151,7 @@ First catalog the following datasets which are on volume NCPSSP:
 ### Update SYS1.PARMLIB
 Make updates to the following SYS1.PARMLIB members. xx is to be replaced with the suffix of the member used during IPL.  
 - LNKLSTxx : Add SYS1.SSPLIB
-- VATLSTxx : Add  NCPSSP,0,2,3350	,N 
+- VATLSTxx : Add  NCPSSP,0,2,3350&emsp;&emsp;&emsp;,N 
 
 ### Replace IFLOADRN (TK4, TK5)  
 The IFLOADN used by TK amd TK5 is a special version for loading fake IBM 3705’s.  
@@ -135,12 +163,64 @@ Note: the old IFLOADRN version is now not avail anymore.
 
 Shutdown MVS and Re-IPL MVS with all these updates.
 
+### Generating and loading the NCP
+
 ## Operation and Use
 ### 3705 Control Panel
 Open a new X-terminal(on the same system that was used to start the 3705 Emulator). And go to directory SIMH_3705_R5.   
 To start the Control Panel, enter: BIN/CPanel
 
-The 3705 control panel should now appear:
+The 3705 control panel should now appear:  
+  
+![LIB panel](/Images/ControlPanel.png) 
+  
+The panel shows at the top right hand:  
+- MEMORY SIZE : 128K	This is the 3705 memory size, taken from the cnf file.   
+- IPL PHASE : 0	 This is the current IPL phase. Will range from 0 (not IPLéd) to 3 (NCP loaded).  
+- FREE BUFFERS: 718	The available buffers for the NCP. Before NCP is loaded this will show 0. During NCP operation the value will fluctuate.  
+- CYCLE COUNT : nnnn	Shows the content of the cycle utilization count register. Every 8 instructions this counter is incremented. It is a 15 bit register, which will wrap around after the max value is reached.  
+
+The top center shows the DISPLAY A and DISPLAY B registers. On a real 3705 panel these are shown as individual bits. As this would clutter the emulator panel, it is shown as five hexadecimal characters: x xx xx.    
+The error indicators are listed separately at the top left (box CCU CHECKS).  If an error occurs, a red “light” will flash after the relevant check.  
+
+In the center of the panel the HEX switches are show. They are labeled A – E. The actual switches are depicted as single digits. A switch can be selected by the left or right cursor keys. The select switch will be highlighted. The value can be changed with the up and down cursor keys.   
+
+Below the HEX switches, the DISPLAY FUNCYION SELECT switch is shown, with 10 possible settings. The default is STATUS. The switch can be “turned” by pressing PF 3 key. The switch turns clockwise. The DISPLAY FUNCTION switch is described in more detail below.   
+
+At the bottom left corner, the Channel Adapter switches are shown. This allows to switch a channel adapter from position A, Disable and B. Each channel adapter can be connected to two hosts. A to one host, B to another. In case of a failure of the active host, the 3705 can be enable for the backup-host by switching the relevant channel adapter to “B”. In case the failing host is recovered, the channel adapter can be switched back to “A”.  
+Switching channel adapter 1 is done via PF 1 key, for channel adapter 2, use PF 2. The PF 1 and PF 2 key simulate the 3 position switch on the real 3705 Control Panel. I.e. The switch goes from the upper position (A), to the center position (Disable both A and B) to the bottom position (B). From the bottom position, the switch goes the other way.   
+The headers “Channel Adapter 1” and “Channel Adapter 2” are show in high-light when a TCP/IP connection exists. Note that this not mean that the channel Adapter is in use! E.g. the above screenshot shows a TCP/IP connection for Channel Adapters 1 and 2, but only channel adapter 1 is in use.
+An active channel Adapter is shown as “ACTIVE”, a connected, but not active adapter is shown as “ENABLED”, a not connected adapter is show as “DISABLED”.  
+In the context of the 3705 emulator, a connected adaptor is one with a TCP/IP connection to Hercules. If that connection is actually online, it is shown as “ACTIVE”, else it is “ENABLED”  
+
+Warning: Switching a channel adapter is immediate. If the (3705) unit is still online while switching, various I/O related errors will occur. An IPL might be needed to recover from this situation. So before switching, make sure the unit is offline.  
+
+The DISPLAY FUNCTION SELECT:
+switch PF 3 changes the switch. The current selection is highlighted. The selections are:   
+- STATUS: This shows the current 3705 status in the A and B DISPLAY. If there is a CCU check, a red light will appear in the CCU CHECKS box. During normal operation the display will be empty.
+- STORAGE ADDRESS: This can be used to display the contents of a 3705-storage location. Enter the address using the HEX switches A-F. If a valid address is entered, the address will be shown in DISPLAY A, the contents in DISPLAY B. If an invalid address is set, the ADDRESS EXCEPT “light” will go on.
+- REGISTER ADDRESS: This can be used to show the contents of one of the 3705 (input) registers. When this function is selected, HEX switch B and D will be highlighted. These can be used to enter the register address; the other switches cannot be used. The switch settings are shown in DISPLAY A, the high-order bits of byte 0 and 1. The content of the register is show in DISPLAY B, bytes 0 and 1.
+- FUNCTION 1: Not yet implemented
+- FUNCTION 2: Not yet implemented
+- FUNCTION 3: Not yet implemented
+- FUNCTION 4: Not yet implemented
+- FUNCTION 5: Not yet implemented
+- FUNCTION 6: Not yet implemented
+- TAR&OP REGISTER: Not yet implemented.
+  
+The LOAD switch
+switch PF 4 is used to reboot the 3705. After pressing PF4 the NCP must be reloaded. If both channel adapters are fully disabled (so both A and B are disabled) the 3705 will load the remote program loader programs from the (virtual) diskette.
+The below image shows the Control Panel channel section for a remote 3705:  
+  
+![LIB panel](/Images/CAs.png)   
+
+The Control panel is updated after pressing any key, except the Home key.  
+
+Exiting the Control panel: Press the Home key.  
+
+  
+
+  
 
 
 ### LIB panel
@@ -266,8 +346,9 @@ Trunk can be terminated with “Ctrl C”.
 All SDLC lines can be configured as Full Duplex lines. So, this applies to lines connecting to  i3274, DLSw or Trunk.  
 
 Full Duplex must be configured in the NCP deck.  Below example shows how this is done on the LINE macro:  
-***********************************************************************  
-L03B20   LINE  ADDRESS=(020,021),  TRANSMIT AND RECEIVE ADDRESSES      X  
+```
+***********************************************************************    
+L03B20   LINE  ADDRESS=(020,021),  TRANSMIT AND RECEIVE ADDRESSES      X    
                DUPLEX=FULL,        MODEM IS STRAPPED FOR FULL DUPLEX   X  
                SPEED=9600,         SPEED MAY BE HIGHERCSEE NOTES)      X  
                NRZI=NO,            SPECIFY YES ONLY IF REQUIRED        X  
@@ -275,7 +356,8 @@ L03B20   LINE  ADDRESS=(020,021),  TRANSMIT AND RECEIVE ADDRESSES      X
                CLOCKNG=EXT,        MODEM PROVIDES CLOCKING             X  
                POLLED=YES,                                             X  
                RETRIES=(5,10,4)    5 RETRIES, 10S DELAY, 4 SEQUENCES  
-
+```
+  
 Basically the ADDRESS parameter defines a lines set comprised of two (consecutive) line numbers. In addition the DUPLEX=FULL parameter needs to be specified.  
 
 Note that Full Duplex always requires two line addresses (a line set).   
