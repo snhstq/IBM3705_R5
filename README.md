@@ -192,27 +192,53 @@ Make updates to the following SYS1.PARMLIB members. xx is to be replaced with th
 - VATLSTxx : Add  NCPSSP,0,2,3350&emsp;&emsp;&emsp;,N 
 
 ### Replace IFLOADRN (TK4, TK5)  
-The IFLOADN used by TK amd TK5 is a special version for loading fake IBM 3705’s.  
+The IFLOADRN used by TK amd TK5 is a special version for loading fake IBM 3705’s.  
+Remove this module by deleting it from SYS1.LINKLIB.	
 
-Restore the original IFLOADRN of IBM or, in case it does not exist:  
-Copy ‘SYS1.SSPLIB(IFLOADRN)’ on NCPSSP to ‘SYS1.LINKLIB(IFLOADRN)’ on the sysres volume.  
+The original module is in dataset SYS1.SSPLIB, which has been added to the linklist and will be used from now on.   
 
-Note: the old IFLOADRN version is now not avail anymore.
+Note: the old IFLOADRN version is now not available anymore, meaning that it is no longer possibe to load the fake NCP's. 
 
 Shutdown MVS and Re-IPL MVS with all these updates.
 
 ### Generating and loading the NCP
+SYS1.NCPSAMP contains member NCPGEN, which is used to generated the stage1 deck for the NCP's
+
+The sample NCP N16A contains:  
+- 1 SDLC line L16A20
+- 1 PU T2 P16A20
+- 2 LU's T16A22A1 and T16A22A2
+- 1 BSC line L16A23		
+- 1 Cluster P16A23A
+- 1 terminal T16A23A1
+
+Before of after the NCP has been loaded i3274 and/or i3271 can be connected to the local and/or remote 3705:   
+BIN/i3274 -cchn efoxcc1 -line 20       
+BIN/i3271 -cchn efoxcc1 -line 23  
+In the above example efoxcc1 is the channel attached (local) 3705.     
+
+Copy the sample NCP N16A from SYS1.NCPSAMP to SYS1.VTAMLST
+Make sure the stage1 SYSIN DD card points to SYS1.VTAMLST the desired member (N16A in this case).
+
+Run job NCPGEN. It should end with RC=0 fro both steps.
+Job NPGEN created the stage1 deck in dataset SYS1.NCPSTG1 on volume NCPSSP
+
+Edit this member end go to the last step in the deck (is either step s16 or s17). Change the DISP field of the SYSLMOD statement to DISP=SHR (otherwise VTAM has to be stopped to allow the job to allocate the dataset).   
+Submit the stage1 deck. the various steps end with either RC=0 or RC=4. Any higher return code indicates an issue.   
 
 
 Load the generated NCP into the IBM 3705  
 
-  -           v net,act,id=N16A                                           
+v net,act,id=N16A             
+```
     STC  439  IST097I  VARY     ACCEPTED
     STC  439  IST197I  SAVED CONFIGURATION N16A  READ FROM VTAMOBJ        
   - STC  439  IEC130I INITEST  DD STATEMENT MISSING                          
     STC  439  IST270I  370X N16A  NOW LOADED WITH LOADMOD N16A         
     STC  439  IST093I  N16A  ACTIVE                                       
-                                    
+   ```
+After IST093I the PU, LU's and/or Cluster and Terminal can be activated.
+
 Activation of the SDLC PU and LU:
 v net,act,id=P16A20A 
 v net,act,id=T16A20A1  
@@ -222,29 +248,20 @@ Activation of the BSC cluster and Terminal:
 v net,act,id=P16A23A  
 v net,act,id=T16A23A1  
 
+(If i3274 or i3271 is started after the NCP has been loaded, the related line needs to be activated first)
 
-                                           
-
- v net,act,id=sdlcpa01,logon=tso,logmode=mhp3278e
-     (this will activates the LU with the proper logmode and 
-      starts the TSO session).
+					   
+SDLC: Connect your TN3270 client to the 3274's IP address with port 32741.
+Logon to TSO:   
+Press [RESET], followed by [CLEAR] and then again press [RESET].   
+Now type: Logon applid(tso) logmode(mhp3278e)   
+press [SYSREQ]  (not [ENTER] !!!)   
  
-Connect your TN3270 client to the EMU3705 IP address 192.168.1.5 port 32001.
-
-Note: during testing we discovered that quick3270 does not work with the tn3270 server in the 3271/3274.  X3270 works perfect.
-
-   ...                     
-   ..                      
-   Connected to device 000
-
-Press
-   [RESET]
-   [CLEAR]
-   [RESET]
-
-Type: ‘logon applid(tso) logmode(mhp3278e)’ and press [SYS-REQ] (not [ENTER]!)
-
-Wait for the TSO login prompt and login:
+BSC: Connect your TN3270 client to the 3274's IP address with port 32711.
+You should shee the NETSOL welcome message.
+Logon to TSO:
+Logon HERC01
+press ENTER
 
 
 ## Operation and Use
@@ -520,16 +537,49 @@ The 3705 is now ready to be loaded over an SDLC line.
 
 First load the local 3705:
 
-V NET,ACT,iD=N16B
+v net,act,id=N16B
 
-After message.....issue
+Wait for  message
+```
+IST093I  N16B     ACTIVE
+```
+Now the remote 3705 can be loaded:
 
-V NET,ACT,ID=N17B
+v net,act,id=N17B
 This start the NCP load over the SDLC line. Note that this will take substantial longer than loading the local 3705.
+After message:
+```
+IST093I  N17B     ACTIVE
+```
+the remote 3705 is ready.   
+  
+The sample NCP N16B contains:  
+- 1 SDLC Full DUplex trunk line L16B20
+- 1 PU T4 P16B20A
+- 1 SDLC leased line L16B22
+- 1 PU T2 P16B22A
+- 2 LU's T17622A1 and T17622A2
+- 1 SDLC switched line L16B23
+- 1 PU T2 P16B23A
+- 8 LU's in a dnamic pool
+  
 
+The sample NCP N17B contains:  
+- 1 SDLC line L17B22
+- 1 PU T2 P17B22A
+- 2 LU's T17B22A1 and T17B22A2
+- 1 BSC line L17B23
+- 1 Cluster P17B23A
+- 1 terminal T17B23A1
 
+Before of after the NCP has been loaded i3274 and/or i3271 can be connected to the local and/or remote 3705:
+BIN/i3274 -cchn efoxcc1 -line 22   
+BIN/i3274 -cchn efoxcc2 -line 22  
+BIN/i3271 -cchn efoxcc2 -line 23
+In the above example efoxcc1 is the channel attached (local) 3705 and efoxcc2 is the remote 3705.  
 
-
+They above listed PU/LU's and/or Cluster/Terminal can now be activated as desired.
+(If i3274 or i3271 is started after the NCP has been loaded, the related line needs to be activated first)
 
 
 
