@@ -176,12 +176,12 @@ Check that the 3705 device address is online in MVS:
 The MVS system can now be IPL'ed.  
 ### Catalog datasets
 First catalog the following datasets which are on volume NCPSSP:  
-- SYS1.GEN3705     
-- SYS1.MAC3705     
-- SYS1.NCPOBJ1      
-- SYS1.NCPSAMP      
-- SYS1.NCPSTG1    
-- SYS1.OBJ3705      
+- SYS1.GEN3705 
+- SYS1.MAC3705
+- SYS1.NCPOBJ1
+- SYS1.NCPSAMP
+- SYS1.NCPSTG1
+- SYS1.OBJ3705
 - SYS1.SSPLIB
 
   SYS1.NCPLOAD is also on volume NCPSSP, but no longer used. So it does not have to be cataloged.
@@ -217,14 +217,14 @@ BIN/i3274 -cchn efoxcc1 -line 20
 BIN/i3271 -cchn efoxcc1 -line 23  
 In the above example efoxcc1 is the channel attached (local) 3705.     
 
-Copy the sample NCP N16A from SYS1.NCPSAMP to SYS1.VTAMLST
-Make sure the stage1 SYSIN DD card points to SYS1.VTAMLST the desired member (N16A in this case).
+Copy the sample NCP N16A from SYS1.NCPSAMP to SYS1.VTAMLST  
+Make sure the stage1 SYSIN DD card points to SYS1.VTAMLST the desired member (N16A in this case).  
 
-Run job NCPGEN. It should end with RC=0 fro both steps.
-Job NPGEN created the stage1 deck in dataset SYS1.NCPSTG1 on volume NCPSSP
+Run job NCPGEN. It should end with RC=0 fro both steps.  
+Job NPGEN created the stage1 deck in dataset SYS1.NCPSTG1 on volume NCPSSP  
 
 Edit this member end go to the last step in the deck (is either step s16 or s17). Change the DISP field of the SYSLMOD statement to DISP=SHR (otherwise VTAM has to be stopped to allow the job to allocate the dataset).   
-Submit the stage1 deck. the various steps end with either RC=0 or RC=4. Any higher return code indicates an issue.   
+Submit the stage1 deck. the various steps end with either RC=0 or RC=4. Any higher return code indicates an issue  .   
 
 
 Load the generated NCP into the IBM 3705  
@@ -239,8 +239,8 @@ v net,act,id=N16A
    ```
 After IST093I the PU, LU's and/or Cluster and Terminal can be activated.
 
-Activation of the SDLC PU and LU:
-v net,act,id=P16A20A 
+Activation of the SDLC PU and LU:  
+v net,act,id=P16A20A   
 v net,act,id=T16A20A1  
 v net,act,id=T16A20A2 (for the 2nd LU).
 
@@ -248,20 +248,20 @@ Activation of the BSC cluster and Terminal:
 v net,act,id=P16A23A  
 v net,act,id=T16A23A1  
 
-(If i3274 or i3271 is started after the NCP has been loaded, the related line needs to be activated first)
+(If i3274 or i3271 is started after the NCP has been loaded, the related line needs to be activated first)  
 
 					   
 SDLC: Connect your TN3270 client to the 3274's IP address with port 32741.
 Logon to TSO:   
-Press [RESET], followed by [CLEAR] and then again press [RESET].   
-Now type: Logon applid(tso) logmode(mhp3278e)   
-press [SYSREQ]  (not [ENTER] !!!)   
+Press [RESET], followed by [CLEAR] and then again press [RESET].     
+Now type: Logon applid(tso) logmode(mhp3278e)     
+press [SYSREQ]  (not [ENTER] !!!)     
  
-BSC: Connect your TN3270 client to the 3274's IP address with port 32711.
-You should shee the NETSOL welcome message.
-Logon to TSO:
-Logon HERC01
-press ENTER
+BSC: Connect your TN3270 client to the 3274's IP address with port 32711.  
+You should shee the NETSOL welcome message.  
+Logon to TSO:  
+Logon HERC01  
+press ENTER  
 
 
 ## Operation and Use
@@ -316,11 +316,6 @@ The below image shows the Control Panel channel section for a remote 3705:
 The Control panel is updated after pressing any key, except the Home key.  
 
 Exiting the Control panel: Press the Home key.  
-
-  
-
-  
-
 
 ### LIB panel
 The Line Interface Base (LIB) is the one place where all lines connect to.Each stand-alone emulator (3271,3274, DLSw, Trunk) has the -line switch as a mandatory start parameter to identify the line to which the connection should be made. Node that this line number must correspond to the line number in the NCP definition for the device being connected.   
@@ -439,8 +434,6 @@ Note that only the connections to  line 20 is shown. The connections to line 21 
 Trunk can be terminated with “Ctrl C”.  
   
 
-
-
 ### Full Duplex
 All SDLC lines can be configured as Full Duplex lines. So, this applies to lines connecting to  i3274, DLSw or Trunk.  
 
@@ -478,7 +471,7 @@ SYS1.NCPSAMP on NCPSSP contains sample NCP's:
 - N17B which is the NCP for the remote 3705
 
 Copy both members to SYS1.VTAMLST
-Follow the steps outlined in section [Generating and Loading the NCP](#generating-and-loading-the-ncp)to generated both NCP's.
+Follow the steps outlined in section [Generating and Loading the NCP](#generating-and-loading-the-ncp) to generated both NCP's.
 
 Start the local 3705
 ./BIN/i3705 3705-128k.cnf 
