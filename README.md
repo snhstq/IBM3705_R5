@@ -67,7 +67,7 @@ Below picture shows the high-level architecture with all components.
 
 ### starting the 3705
 The 3705 may be started before of after Hercules is started. The (TCP/IP) channel conection is made as soon as both ends are available. As such, the 3705 can be stopped and started at any point without the need to restart Hercules.
-Th 3705 is started from directory SIMH_3705_R5 with the command:
+The 3705 is started from directory SIMH_3705_R5 with the command:
 
 ./BIN/i3705 3705-128k.cnf 
 
@@ -108,7 +108,7 @@ The 3705 is now ready to be loaded with an NCP.
 
 ### Preparing the MVS system
 This section is generic. It applies to a CPIPO build of MVS, TK5 or whatever other ways the MVS system has been created.    
-Copy file ‘ncpssp.3350’ fro the 3705 emulator package ‘Hercules Files’ directory to your Hercules/hyperion dasd folder.
+Copy file ‘ncpssp.3350’ for the 3705 emulator package ‘Hercules Files’ directory to your Hercules/hyperion dasd folder.
 
 Update the Hercules cnf file  and add ncpssp.3350 to the dasd configuration.
 Be sure to select an address that is generated as a 3350.
