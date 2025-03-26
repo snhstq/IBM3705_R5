@@ -478,7 +478,7 @@ SYS1.NCPSAMP on NCPSSP contains sample NCP's:
 - N17B which is the NCP for the remote 3705
 
 Copy both members to SYS1.VTAMLST
-Follow the steps outlined in section [Trunk](#trunk)to generated both NCP's.
+Follow the steps outlined in section [Generating and Loading the NCP](#generating-and-loading-the-ncp)to generated both NCP's.
 
 Start the local 3705
 ./BIN/i3705 3705-128k.cnf 
