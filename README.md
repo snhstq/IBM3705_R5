@@ -120,16 +120,17 @@ For TK5 the address range 240-24F are 3350’s.  Below 244 is used.
 
 Now add the 3705 to the hercules configuration file. Make sure to use an address that is generated as a 3705.
 For TK5 this is 660. Make sure to comment out the existing definition for device 660. For TK5 the updates should be made to tk5_default.cnf:  
-\#  
-\# NCP VTAM  
-\#  
-0660 3705 adaptip=192.168.1.05 port=37051  <=== Added. 192.168.1.05 should be replaced with the IP address of the host running your 3705.   
-\#0660 3705 lport=${N660PORT:=37051} locncpnm=N07 rmtncpnm=N08 unitsz=252 ackspeed=1000  
+```
+#  
+# NCP VTAM  
+#  
+0660 3705 adaptip=192.168.1.05 port=37051  <=== Added. 192.168.1.05 should be replaced with the IP address of your 3705 host.   
+#0660 3705 lport=${N660PORT:=37051} locncpnm=N07 rmtncpnm=N08 unitsz=252 ackspeed=1000  
 0661 3705 lport=${N661PORT:=37052} locncpnm=N10 rmtncpnm=N11 idblk=017 idnum=00018 locsuba=10 rmtsuba=11 unitsz=252 ackspeed=1000  
 0662 3705 lport=${N662PORT:=37053} locncpnm=N12 rmtncpnm=N13 idblk=017 idnum=00019 locsuba=12 rmtsuba=13 unitsz=252 ackspeed=1000  
 0663 3705 lport=${N663PORT:=37054} locncpnm=N14 rmtncpnm=N15 idblk=017 idnum=0001a locsuba=14 rmtsuba=15 unitsz=252 ackspeed=1000  
-\#  
-
+#  
+```
 Note: comm3705 will always display informational (CCxxxnnI) and error (CCxxxnnE) messages. When debug=yes is specified in the above configuration statement for device 660,  all Debug (CCxxxnnD) messages will be displayed too.  
 Adding tracesna=yes in will display the translated SNA command’s that are sent/received.  
 With standard Hercules command ‘t+ cua’ (e.g. t+ 660) you can activate the CCW trace and ‘t- 660’ will disabled it again.   
@@ -165,25 +166,24 @@ CCTAG019I 1:0660: connections on port 37051; Bus socket: 49, Tag socket: 50
 ### IPL MVS
 IPL MVS. After IPL completion 
 Check that the 3705 device address is online in MVS:  
-
+```
  d u,,,660,1                                                   
  IEE450I 09.34.55 UNIT STATUS         FRAME LAST         F      E     1A    
  UNIT TYPE STATUS  VOLSER VOLSTATE                                          
  660  3705 O                                                                
-
+```
   
  
 The MVS system can now be IPL'ed.  
 ### Catalog datasets
 First catalog the following datasets which are on volume NCPSSP:  
-- SYS1.GEN3705 
+- SYS1.GEN3705
 - SYS1.MAC3705
 - SYS1.NCPOBJ1
 - SYS1.NCPSAMP
 - SYS1.NCPSTG1
 - SYS1.OBJ3705
 - SYS1.SSPLIB
-
   SYS1.NCPLOAD is also on volume NCPSSP, but no longer used. So it does not have to be cataloged.
    
 ### Update SYS1.PARMLIB
@@ -250,18 +250,7 @@ v net,act,id=T16A23A1
 
 (If i3274 or i3271 is started after the NCP has been loaded, the related line needs to be activated first)  
 
-					   
-SDLC: Connect your TN3270 client to the 3274's IP address with port 32741.
-Logon to TSO:   
-Press [RESET], followed by [CLEAR] and then again press [RESET].     
-Now type: Logon applid(tso) logmode(mhp3278e)     
-press [SYSREQ]  (not [ENTER] !!!)     
- 
-BSC: Connect your TN3270 client to the 3274's IP address with port 32711.  
-You should shee the NETSOL welcome message.  
-Logon to TSO:  
-Logon HERC01  
-press ENTER  
+					 
 
 
 ## Operation and Use
@@ -341,7 +330,58 @@ The above display shows Line 20, connected, active to VTAM and in session (RTS i
 Line 21 is active for VTAM (DTR high), but not connected. Therefore, this must be a switched line.  
 Line 22 shows connected (DSR and RI), but not active for VTAM.  
 Line 23 is not connected and not active for VTAM.  
+  
+### 3274
+The i3274 component is an SDLC multi-drop IBM 3274 emulator. The default configuration consists of two 3274's, each capable of connection with 4 3270 emulators (like x3270 or tn3270).  
+The 3274 is started from directory SIMH_3705_R5:
+./BIN/i3274 -cchn efoxcc1 -line 20	
+-cchn is the hostname running your 3705. Line 20 is the SDLC line defined in the NCP. Instead of -cchn the IP address of your 3705 host can be specified with -ccip.   
+The 3274 can also run in Full Duplex mode. In that case the -fdx switch is to be used. See section [Full Duplex](#full-duplex) for more details on Full Duplex.    
+The following messages will appear:
+   
+```
+PU2: Connection to be established with 3705 SDLC line at host efoxcc1
+PU2: Connection to be established with SDLC line 20
+PU2: Waiting for SDLC Line 20 connection to be established
+PU2: SDLC Line 20 connection has been established
+PU2: Using network Address 192.168.2.71 on eth0 for 3270 connections
+PU2: 3274-0 IML ready. TN3270 can connect to port 32741 
+PU2: 3274-1 IML ready. TN3270 can connect to port 32742
+```
 
+Connect your TN3270 client to the 3274's IP address with port 32741  (or 32742 for the 2nd 3274).
+Logon to TSO:   
+Press [RESET], followed by [CLEAR] and then again press [RESET].     
+Now type: Logon applid(tso) logmode(mhp3278e)     
+press [SYSREQ]  (not [ENTER] !!!)  
+
+NB: 3270 emulatures allow to specify the LU name. These allow to conect to a specific LU. So, if you want to connect to the 2nd LU, specify LU 01 as the LU name in the 3274 emulator.   
+By default there are 4 LU's defined. so 03 is the highest. If you do not specyfy a LU name, the 3274 will select the first one available.   
+
+### 3271
+The i3271 component is an BSC  multi-drop IBM 3271 emulator. The default configuration consists of two 3271's, each capable of connection with 4 3270 emulators (like x3270 or tn3270).  
+The 3271 is started from directory SIMH_3705_R5:
+./BIN/i3271 -cchn efoxcc1 -line 20	
+-cchn is the hostname running your 3705. Line 20 is the BSC line defined in the NCP. Instead of -cchn the IP address of your 3705 host can be specified with -ccip.  
+   
+The following messages will appear:
+```
+CLU: Connection to be established with 3705 BSC line at host efoxcc1
+CLU: Connection to be established with BSC line 20
+CLU: Waiting for BSC Line  20 connection to be established
+CLU: BSC Line 20 connection has been established
+CLU: Using network Address 192.168.2.71 on eth0 for 3270 connections
+CLU: 3271-0 IML ready. TN3270 can connect to port 32711 
+CLU: 3271-1 IML ready. TN3270 can connect to port 32712 	
+```
+Connect your TN3270 client to the 3274's IP address with port 32711 (or 32712 for the 2nd cluster).  
+You should shee the NETSOL welcome message.  
+Logon to TSO:  
+Logon HERC01  
+press ENTER 
+
+NB: 3270 emulatures allow to specify the LU name. These allow to conect to a specific yerminal. So, if you want to connect to the 2nd terminal, specify LU 01 as the terminal name in the 3271 emulator.   
+By default there are 4 LU's defined. so 03 is the highest. If you do not specyfy a LU name, the 3271 will select the first one available.  
 
 ### DLSw
 With DLSw you can connect a real SDLC device to i3705. You will need a real DLSw router to which the SDLC device is connected.  
