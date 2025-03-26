@@ -1,5 +1,7 @@
 # IBM3705_R5
-## About this project
+## About the 3705 emulator project
+This project aims at delivering an IBM 3705-II emulator, specifically designed to connect to the Hercules mainframe emulator.  
+The 3705 emulator allows running  IBM NCP software up to NCP version 3 (The last NCP version supporting a 3705-II). The package also includes a 3274 PU T2 emulator as well as a 3271 Cluster emulator. This enables 3270 emulation software, like x3270 or tn3270,  to connect to the 3705 via using the SLDC or BSC protocol. In addtion, it is even possible to connect actual IBM hardware to the 3705 emulator using a Data Link Switch. 
   
 ## Release Notes
 The main updates with Release 5 of the IBM 3705 SIMH emulator:
