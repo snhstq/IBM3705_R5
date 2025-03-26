@@ -1,4 +1,6 @@
 # IBM3705_R5
+## About this project
+  
 ## Release Notes
 The main updates with Release 5 of the IBM 3705 SIMH emulator:
 
@@ -22,6 +24,8 @@ The main updates with Release 5 of the IBM 3705 SIMH emulator:
 	Various issues have ben resolved, including the annoying issue with i3274  whereby a logon was no longer possible after a logoff.
 	
 ## Installation
+Please make sure to review the issues section of the GitHub project.   
+  
 ### Environments
 The 3705 emulator has been tested against the following:   
 - Linux for RPi Debian Buster, Bullseye and Bookworm
@@ -611,7 +615,165 @@ In the above example efoxcc1 is the channel attached (local) 3705 and efoxcc2 is
 They above listed PU/LU's and/or Cluster/Terminal can now be activated as desired.
 (If i3274 or i3271 is started after the NCP has been loaded, the related line needs to be activated first)
 
+## NCP example for the  last version of NCP that supports a 3705.
+```
+***********************************************************************
+*                                                                     *
+*      ACF/NCP V3                                                     *
+*      THIS GENERATION IS FOR AN IBM 3705-II                          *
+*                                                                     *
+***********************************************************************
+         SPACE 2
+***********************************************************************
+*      PCCU SPECIFICATIONS - OS/VS (VTAM ONLY)                        *
+***********************************************************************
+NCPSTART PCCU  CUADDR=5A0,         3705 CONTROL UNIT ADDRESS           X
+               AUTODMP=NO,         PROMPT BEFORE DUMPING NCP           X
+               AUTOIPL=NO,         NO AUTOIPL AND RESTART              X
+               LOADSTA=5A0-S,                                          X
+               DUMPSTA=5A0-S,                                          X
+               DUMPDS=NCPDUMP,     AUTODUMP REQUESTED                  X
+               SUBAREA=1,                                              X
+               CHANCON=COND,                                           X
+               OWNER=NCPHOST,                                          X
+               VFYLM=YES,                                              X
+               MAXDATA=4096,                                           X
+               INITEST=NO          NCP INITIALIZATION TEST
+         EJECT
+***********************************************************************
+*      BUILD MACRO SPECIFICATIONS FOR OS                              *
+***********************************************************************
+NCPBUILD BUILD MAXSUBA=31,          MUST BE SAME AS IN VTAM STR DEF    X
+               LOADLIB=NCPLIB,      LIBRARY FOR NCP LOAD MODULE        X
+               QUALIFY=SYS1,        1ST LEVEL QUALIFIER                X
+               VERSION=V3,                                             X
+               TYPSYS=OS,                                              X
+               MEMSIZE=256,         3705 STORAGE SIZE IS 256K          X
+               TYPGEN=NCP,          NCP ONLY                           X
+               MAXSSCP=2,                                              X
+               NUMHSAS=2,                                              X
+               BFRS=88,             NCP BUFFER SIZE                    X
+               CA=(TYPE2),          CA 1 IS TYPE 2                     X
+               NCPCA=(ACTIVE),      CA 1 ACTIVE                        X
+               ERASE=NO,            DO NOT ERASE BUFFERS (DEFAULT)     X
+               ENABLTO=2.2,         LEASED LINE ONLY (DEFAULT)         X
+               MODEL=3705-2,        .                                  X
+               DELAY=(0.2),                                            X
+               NEWNAME=EFXNCP2,     NAME OF THIS LOAD MODULE           X
+               OLT=NO,              ONLINE TEST AVAILABLE(DEFAULT)     X
+               SLODOWN=12,          SLOWDOWN WHEN 12% OF BUFFERS AVAIL X
+               SUBAREA=3,           SUBAREA ADDRESS = 3                X
+               VRPOOL=6,                                               X
+               TRACE=(YES,10)       10 ADDRESS-TRACE ENTRIES
+         EJECT
+***********************************************************************
+*      SYSCNTRL OPTIONS FOR VTAM OR TCAM                              *
+*      NOTE THAT OPERATOR CONTROLS ARE NOT INCLUDED.                  *
+***********************************************************************
+NCPSYSC  SYSCNTRL OPTIONS=(MODE,                                       X
+               RCNTRL,RCOND,RECMD,RIMM,ENDCALL,                        X
+               BHSASSC)
+         EJECT
+***********************************************************************
+*      HOST MACRO SPECIFICATIONS OS VTAM                              *
+*      UNITSZ TIMES MAXBFRU MINUS BFRPAD EQUALS MAX MESSAGE SIZE      *
+*      FOR INBOUND MESSAGES                                           *
+***********************************************************************
+NCPHOST  HOST  INBFRS=25,          INITIAL 3705 ALLOCATION             X
+               MAXBFRU=25,         VTAM BUFFER UNIT ALLOCATION         X
+               BFRPAD=0,                                               X
+               UNITSZ=256,                                             X
+               SUBAREA=1,           SUBAREA ADDRESS = 1                X
+               TIMEOUT=(120.0)     AUTO SHUT DOMN IF NO RESP IN 120SEC
+         EJECT
+***********************************************************************
+*      CSB MACRO SPECIFICATIONS                                       *
+***********************************************************************
+NCPCSB   CSB   SPEED=(2400),       BUS MACH CLOCK                      X
+               MOD=0,              SCANNER ADDRESS 000 TO 01F          X
+               TYPE=TYPE2          TYPE 1 COMM SCANNER
+         EJECT
+***********************************************************************
+*      PATH SPECIFICATIONS                                            *
+***********************************************************************
+NCP03   PATH  DESTSA=1,                                                X
+               ER1=(1,1)
+         EJECT
+***********************************************************************
+*      SPECIFICATIONS FOR SDLC LEASED LINES                           *
+*      GROUP MACRO SPECIFICATIONS                                     *
+***********************************************************************
+SDLCGPL GROUP LNCTL=SDLC,          SYNCHRONOUS DATA LINK               X
+               DIAL=NO,            REQUIRED FOR LEASED LINE            X
+               REPLYTO=1.0,        USE DEFAULT                         X
+               TYPE=NCP            NCP ONLY
+        SPACE  2
+***********************************************************************
+*      LINE MACRO SPECIFICATION - FULL-DUPLEX, LEASED                 *
+*      MAY BE USED FOR 3790, 3600, OR 3650                            *
+*                                                                     *
+*      NOTE: LINE SPEED MAY BE RAISED TO 2400 FOR                     *
+*      ALL PHYSICAL UNITS AND TO 4800 FOR 3600 AND 3650               *
+*      WITHOUT DOING A NEW GEN OF NCP.                                *
+*      RETRIES VALUE FOR LINE SHOULD BE GREATER THAN 30               *
+*      SECONDS AND LESS THAN ONE MINUTE FOR 3650.                     *
+*                                                                     *
+***********************************************************************
+SDLC01   LINE  ADDRESS=020,        TRANSMIT AND RECEIVE ADDRESSES      X
+               DUPLEX=HALF,        MODEM IS STRAPPED FOR FULL DUPLEX   X
+               SPEED=56000,        SPEED MAY BE HIGHERCSEE NOTES)      X
+               NRZI=NO,            SPECIFY YES ONLY IF REQUIRED        X
+               NEWSYNC=NO,         CHECK MODEM REQUIREMENTS            X
+               CLOCKNG=EXT,        MODEM PROVIDES CLOCKING             X
+               RETRIES=(5,10,4)    5 RETRIES PER RECOVERY SEQUENCE
+         SPACE 2
+***********************************************************************
+*      SERVICE ORDER FOR SDLC LINK                                    *
+***********************************************************************
+         SERVICE ORDER=(SDLCPU01)
+         EJECT
+***********************************************************************
+*      PHYSICAL UNIT SPECIFICATIONS                                   *
+***********************************************************************
+SDLCPU01 PU    ADDR=C1,           POLL ADDRESS                         X
+               PUTYPE=2,                                               X
+               ISTATUS=ACTIVE,                                         X
+               MODETAB=ISTINCLM,                                       X
+               SSCPFM=USS3270,                                         X
+               USSTAB=ISTINCDT,                                        X
+               MAXOUT=7,          MAX PATH INFO UNITS BEFORE RESPONSE  X
+               MAXDATA=1024,      MAXIMUM AMOUNT OF DATA               X
+               PASSLIM=7,         .                                    X
+               PACING=0,          FOR DISPLAYS AND DSC PRINTERS        X
+               VPACING=0,         FOR DISPLAYS AND DSC PRINTERS        X
+               DISCNT=(NO),       .                                    X
+               RETRIES=(,1,4)     4 RETRIES, 1 SECOND BETWEEN
+         SPACE 2
+***********************************************************************
+*      LOGICAL UNIT SPECIFICATIONS                                    *
+***********************************************************************
+SDLCLU01 LU LOCADDR=2,                                                 X
+               USSTAB=MVSUSS,                                          X
+               DLOGMOD=D4C32782,                                       X
+               ISTATUS=ACTIVE
+SDLCLU02 LU LOCADDR=3,                                                 X
+               USSTAB=MVSUSS,                                          X
+               DLOGMOD=D4C32782,                                       X
+               ISTATUS=INACTIVE
+SDLCLU03 LU LOCADDR=4,                                                 X
+               DLOGMOD=D4C32782,                                       X
+               ISTATUS=INACTIVE
+SDLCLU04 LU LOCADDR=5,                                                 X
+               DLOGMOD=D4C32782,                                       X
+               ISTATUS=INACTIVE
+         EJECT
+***********************************************************************
+*      GENEND DELIMITER                                               *
+***********************************************************************
+         GENEND
+         END
 
+```
 
 ## Future updates:
 	
