@@ -115,7 +115,7 @@ Be sure to select an address that is generated as a 3350.
 For TK5 the address range 240-24F are 3350’s.  Below 244 is used.
 ...
 
-0244 3350 dasd/ncpssp.3350         <=== Added
+0244 3350 dasd/ncpssp.3350&emsp;&emsp;&emsp<=== Added
 ...
 
 Now add the 3705 to the hercules configuration file. Make sure to use an address that is generated as a 3705.
@@ -183,7 +183,7 @@ First catalog the following datasets which are on volume NCPSSP:
 - SYS1.NCPSAMP
 - SYS1.NCPSTG1
 - SYS1.OBJ3705
-- SYS1.SSPLIB
+- SYS1.SSPLIB  
   SYS1.NCPLOAD is also on volume NCPSSP, but no longer used. So it does not have to be cataloged.
    
 ### Update SYS1.PARMLIB
@@ -232,8 +232,7 @@ Load the generated NCP into the IBM 3705
 v net,act,id=N16A             
 ```
     STC  439  IST097I  VARY     ACCEPTED
-    STC  439  IST197I  SAVED CONFIGURATION N16A  READ FROM VTAMOBJ        
-  - STC  439  IEC130I INITEST  DD STATEMENT MISSING                          
+    STC  439  IST197I  SAVED CONFIGURATION N16A  READ FROM VTAMOBJ                                 
     STC  439  IST270I  370X N16A  NOW LOADED WITH LOADMOD N16A         
     STC  439  IST093I  N16A  ACTIVE                                       
    ```
@@ -248,11 +247,9 @@ Activation of the BSC cluster and Terminal:
 v net,act,id=P16A23A  
 v net,act,id=T16A23A1  
 
-(If i3274 or i3271 is started after the NCP has been loaded, the related line needs to be activated first)  
+If i3274 or i3271 is started after the NCP has been loaded, the related line needs to be activated first. Note that in that case you would have seen een I/O errer on the line (IST631).  
 
-					 
-
-
+				
 ## Operation and Use
 ### 3705 Control Panel
 Open a new X-terminal(on the same system that was used to start the 3705 Emulator). And go to directory SIMH_3705_R5.   
