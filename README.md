@@ -1,29 +1,29 @@
 # IBM3705_R5
 ## About the 3705 emulator project
 This project aims at delivering an IBM 3705-II emulator, specifically designed to connect to the Hercules mainframe emulator.  
-The 3705 emulator allows running  IBM NCP software up to NCP version 3 (The last NCP version supporting a 3705-II). The package also includes a 3274 PU T2 emulator as well as a 3271 Cluster emulator. This enables 3270 emulation software, like x3270 or tn3270,  to connect to the 3705 via using the SLDC or BSC protocol. In addtion, it is even possible to connect actual IBM hardware to the 3705 emulator using a Data Link Switch. 
+The 3705 emulator allows running  IBM NCP software up to NCP version 3 (The last NCP version supporting a 3705-II). The package also includes a 3274 PU T2 emulator as well as a 3271 cluster emulator. This enables 3270 emulation software, like x3270 or tn3270,  to connect to the 3705 using the SLDC or BSC protocol. In addtion, it is even possible to connect actual IBM hardware to the 3705 emulator using a Data Link Switch. 
   
 ## Release Notes
 The main updates with Release 5 of the IBM 3705 SIMH emulator:
 
 1. Remote 3705:  
-    The 3705 is now equipped with a (virtual) diskette containing the Remote Program Loader (RPL).  When the 3705 is activated with all channel adapters disabled, it will load the RPL from the diskette.
- 	This allows the 3705 to be loaded over an SDLC line. The channela dapters can be disabled through the SIMH config file or via the Control Panel.
+    The 3705 is now equipped with a (virtual) diskette containing the Remote Program Loader (RPL).  When the 3705 is activated with all channel adapters disabled, it will automatically load the RPL from the diskette.
+ 	This allows the 3705 to be loaded via an SDLC line connected to a local, channel attached 3705. The channel adapters can be disabled through the SIMH config file or via the Control Panel.
 	The RPL diskette is based on an Amdahl 4705 diskette.
 2. Full Duplex:  
-     All The 3705 and all the SDLC components (i3274, DLSw and Trunk) now support full duplex mode. 
-3.  NModem has been renamed to Trunk. Trunk was IBM's original name for a SDLC connection between two 3705's. 
+     The 3705 and all the SDLC components (i3274, DLSw and Trunk) now support full duplex mode. 
+3.  NModem has been renamed to Trunk. Trunk was IBM's original name for an SDLC connection between two 3705's. 
 4.  Control Panel:  
-    Front Panel is renamed to Control Pabel. The panel visualisation has been split from the main 3705 code. This panel visualization component runs in it's own xterm window, ensuring 
-    that messages comming out of the 3705 component remian visible. 
+    Front Panel is renamed to Control Panel. The panel visualisation has been split from the main 3705 code. This panel visualization component runs in it's own xterm window, ensuring 
+    that messages comming out of the 3705 component remain visible. 
     The Control Panel is now equipped with a "Load" button which can be used to restart the 3705 without having to stop and start the emulator. 
 	A "disable" setting has been added to the channel A/B switches. By setting all Channel Adapters to disable and pressing the "Load" button, 
-	the 3705 loads the diskette wit the Remeote Prgram Loader and therefor becomes aremote 3705. 
+	the 3705 loads the diskette with the Remeote Program Loader and therefor becomes a remote 3705. 
 4.  RS232 rework:  
     The RS232 emulation has been significantly simplified and made more accurate. The DCE emulation is no longer located in the 3271 and 3274 emulation, but is now kept in the 3705 LIB.
     The RS232 signals are therefor no longer send across the TCP/IP connection to the 3271/3274
 6.  Issue Fixes: 
-	Various issues have ben resolved, including the annoying issue with i3274  whereby a logon was no longer possible after a logoff.
+	Various issues have ben resolved, including the annoying issue with the 3274  whereby a logon was no longer possible after a logoff.
 	
 ## Installation
 Please make sure to review the issues section of the GitHub project.   
@@ -39,7 +39,7 @@ The 3705 emulator has been tested against the following:
 - TK4
 - TK5
 - SIMH 3.11-0
-- X3270
+- X3270, Putty
 
 ### Installing the 3705 emulator
 #### Preparing the Linux environment
@@ -54,14 +54,15 @@ git clone https://github.com/snhstq/IBM3705_R5.git
 For building the 3705 emulator go to directory IBM3705_R5  
 
 The package comes with the following components:  
+```
 1. i3705	This is the actual 3705 emulator. 	**Build instruction: make i3705** 
 2. i3274	The 3274 PU type 2 emulator (SDLC). 	**Build instruction: make i3274**
 3. i3271	The 3271 cluster emulator (BSC). 	**Build instruction: make i3271**
 4. DLSw		Data Link Switch (SDLC).		**Build instruction: make DLSw**
 5. Trunk	Interconnection between two 3705's.	**Build instruction: make Trunk**
 6. CPanel	The 3705 Control panel.			**Build instruction: make CPanel**
-
-All these makes should end without any issues.
+```
+All these "makes" should end without any issues.
 After a make, the executable is stored in the BIN directory.
 
 component 1 is madatory (duh...)
@@ -72,7 +73,7 @@ Below picture shows the high-level architecture with all components.
 
 
 ### starting the 3705
-The 3705 may be started before of after Hercules is started. The (TCP/IP) channel conection is made as soon as both ends are available. As such, the 3705 can be stopped and started at any point without the need to restart Hercules.
+The 3705 may be started before of after Hercules is started. The (TCP/IP) channel conection is (re)established as soon as both ends are available. As such, the 3705 can be stopped and started at any point without the need to restart Hercules.
 The 3705 is started from directory SIMH_3705_R5 with the command:
 
 ./BIN/i3705 3705-128k.cnf 
@@ -125,7 +126,7 @@ For TK5 the address range 240-24F are 3350’s.  Below 244 is used.
 ...
 
 Now add the 3705 to the hercules configuration file. Make sure to use an address that is generated as a 3705.
-For TK5 this is 660. Make sure to comment out the existing definition for device 660. For TK5 the updates should be made to tk5_default.cnf:  
+For TK5 this is 660 (NB: Remove or comment out the existing definition for device 660). For TK5 the updates should be made to tk5_default.cnf:  
 ```
 #  
 # NCP VTAM  
@@ -141,10 +142,6 @@ Note: comm3705 will always display informational (CCxxxnnI) and error (CCxxxnnE)
 Adding tracesna=yes in will display the translated SNA command’s that are sent/received.  
 With standard Hercules command ‘t+ cua’ (e.g. t+ 660) you can activate the CCW trace and ‘t- 660’ will disabled it again.   
 
-Adding tracesna=yes in de Hercules ‘conf/tk4-default’ file will display the translated SNA command’s that are sent/received.
-
-
-
 Below table gives an overview of the IP port usage by the 3705:
 | 37005 Channel Adapter | Channel Switch | IP Poert |
 | --------------------- | -------------- | ---------|
@@ -156,21 +153,22 @@ Below table gives an overview of the IP port usage by the 3705:
 
 The 3705 can handle 2 channel adapters, each consisting of two cannels "A" and "B".    
 On a MVS3.8 system, with VTAM L2 and the NCP version supplied on volume NCPSSP, only 1 channel can be active at any one time.  
-The "B" channel of the 1st channel adapter was intended as a backup in case  the "A" channel failed.   
-The 2nd channel adapter was intended to be used as a connection to a backup host system. Like with the 1st channel adapter, the "B" channel was the backup for the "A" channel.  
-Higher version of VTAM and NCP provide multi-channel support. When these are used, the 3705 emulator can connect to two hosts (Channel adapteer 1 to one host, the 2nd adapter to the other).    
+The "B" channel of the 1st channel adapter is intended as a backup in case  the "A" channel failed.   
+The 2nd channel adapter is intended to be used as a connection to a backup host system. Like with the 1st channel adapter, the "B" channel is the backup for the "A" channel.  
+Higher version of VTAM and NCP provide multi-channel support. When these are used, the 3705 emulator can connect to two hosts (Channel adapter 1 to one host, the 2nd adapter to the other).    
 
 ### Starting Hercules
 After the config changes have been made to Hercules, it can be started. You will see the following messages on the Hercules screen:  
+```
 CCTAG002D 1:0660: Preparing connection with remote channel adapter  
 CCBUS019I 1:0660: Waiting for bus(49) connection to be established  
 CCBUS019I 1:0660: Waiting for tag(50) connection to be established  
 CCTAG003I 1:0660: tag connection established on socket 50  
 CCBUS003I 1:0660: bus connection established on socket 49  
 CCTAG019I 1:0660: connections on port 37051; Bus socket: 49, Tag socket: 50  
-
+```
 ### IPL MVS
-IPL MVS. After IPL completion 
+IPL MVS. After IPL completion: 
 Check that the 3705 device address is online in MVS:  
 ```
  d u,,,660,1                                                   
@@ -179,8 +177,6 @@ Check that the 3705 device address is online in MVS:
  660  3705 O                                                                
 ```
   
- 
-The MVS system can now be IPL'ed.  
 ### Catalog datasets
 First catalog the following datasets which are on volume NCPSSP:  
 - SYS1.GEN3705
@@ -197,19 +193,20 @@ Make updates to the following SYS1.PARMLIB members. xx is to be replaced with th
 - LNKLSTxx : Add SYS1.SSPLIB
 - VATLSTxx : Add  NCPSSP,0,2,3350&emsp;&emsp;&emsp;,N 
 
-### Replace IFLOADRN (TK4, TK5)  
+### Remove 'fake' IFLOADRN (TK4, TK5)  
 The IFLOADRN used by TK amd TK5 is a special version for loading fake IBM 3705’s.  
 Remove this module by deleting it from SYS1.LINKLIB.	
 
 The original module is in dataset SYS1.SSPLIB, which has been added to the linklist and will be used from now on.   
 
-Note: the old IFLOADRN version is now not available anymore, meaning that it is no longer possibe to load the fake NCP's. 
+Note: the 'fake' IFLOADRN version is now not available anymore, meaning that it is no longer possibe to load the fake NCP's. 
 
 Shutdown MVS and Re-IPL MVS with all these updates.
 
 ### Generating and loading the NCP
-SYS1.NCPSAMP contains member NCPGEN, which is used to generated the stage1 deck for the NCP's
-
+SYS1.NCPSAMP contains member NCPGEN, which is used to generate the stage1 deck for the NCP's
+There are also 3 sample NCP's on SYS1.NCPSAMP.   
+   
 The sample NCP N16A contains:  
 - 1 SDLC line L16A20
 - 1 PU T2 P16A20
@@ -226,11 +223,11 @@ In the above example efoxcc1 is the channel attached (local) 3705.
 Copy the sample NCP N16A from SYS1.NCPSAMP to SYS1.VTAMLST  
 Make sure the stage1 SYSIN DD card points to SYS1.VTAMLST the desired member (N16A in this case).  
 
-Run job NCPGEN. It should end with RC=0 fro both steps.  
+Run job NCPGEN. It should end with RC=0 for both steps.  
 Job NPGEN created the stage1 deck in dataset SYS1.NCPSTG1 on volume NCPSSP  
 
 Edit this member end go to the last step in the deck (is either step s16 or s17). Change the DISP field of the SYSLMOD statement to DISP=SHR (otherwise VTAM has to be stopped to allow the job to allocate the dataset).   
-Submit the stage1 deck. the various steps end with either RC=0 or RC=4. Any higher return code indicates an issue  .   
+Submit the stage1 deck. The various steps end with either RC=0 or RC=4. Any higher return code indicates an issue.   
 
 
 Load the generated NCP into the IBM 3705  
@@ -253,7 +250,7 @@ Activation of the BSC cluster and Terminal:
 v net,act,id=P16A23A  
 v net,act,id=T16A23A1  
 
-If i3274 or i3271 is started after the NCP has been loaded, the related line needs to be activated first. Note that in that case you would have seen een I/O errer on the line (IST631).  
+If i3274 or i3271 is started after the NCP has been loaded, the related line needs to be activated first. Note that in that case you would have seen een I/O error on the line (VTAM message IST631).  
 
 				
 ## Operation and Use
@@ -266,13 +263,13 @@ The 3705 control panel should now appear:
 ![LIB panel](/Images/ControlPanel.png) 
   
 The panel shows at the top right hand:  
-- MEMORY SIZE : 128K	This is the 3705 memory size, taken from the cnf file.   
-- IPL PHASE : 0	 This is the current IPL phase. Will range from 0 (not IPLéd) to 3 (NCP loaded).  
+- MEMORY SIZE : 128K	This is the 3705 memory size as specified in the cnf file.   
+- IPL PHASE : 0	 This is the current IPL phase. Will range from 0 (not IPL'd) to 3 (NCP loaded).  
 - FREE BUFFERS: 718	The available buffers for the NCP. Before NCP is loaded this will show 0. During NCP operation the value will fluctuate.  
 - CYCLE COUNT : nnnn	Shows the content of the cycle utilization count register. Every 8 instructions this counter is incremented. It is a 15 bit register, which will wrap around after the max value is reached.  
 
 The top center shows the DISPLAY A and DISPLAY B registers. On a real 3705 panel these are shown as individual bits. As this would clutter the emulator panel, it is shown as five hexadecimal characters: x xx xx.    
-The error indicators are listed separately at the top left (box CCU CHECKS).  If an error occurs, a red “light” will flash after the relevant check.  
+The error indicators are listed separately at the top left (box CCU CHECKS).  If an error occurs, a red “light” will appear after the relevant check.  
 
 In the center of the panel the HEX switches are show. They are labeled A – E. The actual switches are depicted as single digits. A switch can be selected by the left or right cursor keys. The select switch will be highlighted. The value can be changed with the up and down cursor keys.   
 
@@ -287,7 +284,7 @@ In the context of the 3705 emulator, a connected adaptor is one with a TCP/IP co
 Warning: Switching a channel adapter is immediate. If the (3705) unit is still online while switching, various I/O related errors will occur. An IPL might be needed to recover from this situation. So before switching, make sure the unit is offline.  
 
 The DISPLAY FUNCTION SELECT:
-switch PF 3 changes the switch. The current selection is highlighted. The selections are:   
+PF 3 changes the switch. The current selection is highlighted. The selections are:   
 - STATUS: This shows the current 3705 status in the A and B DISPLAY. If there is a CCU check, a red light will appear in the CCU CHECKS box. During normal operation the display will be empty.
 - STORAGE ADDRESS: This can be used to display the contents of a 3705-storage location. Enter the address using the HEX switches A-F. If a valid address is entered, the address will be shown in DISPLAY A, the contents in DISPLAY B. If an invalid address is set, the ADDRESS EXCEPT “light” will go on.
 - REGISTER ADDRESS: This can be used to show the contents of one of the 3705 (input) registers. When this function is selected, HEX switch B and D will be highlighted. These can be used to enter the register address; the other switches cannot be used. The switch settings are shown in DISPLAY A, the high-order bits of byte 0 and 1. The content of the register is show in DISPLAY B, bytes 0 and 1.
@@ -299,8 +296,7 @@ switch PF 3 changes the switch. The current selection is highlighted. The select
 - FUNCTION 6: Not yet implemented
 - TAR&OP REGISTER: Not yet implemented.
   
-The LOAD switch
-switch PF 4 is used to reboot the 3705. After pressing PF4 the NCP must be reloaded. If both channel adapters are fully disabled (so both A and B are disabled) the 3705 will load the remote program loader programs from the (virtual) diskette.
+The LOAD switch is used to reboot the 3705. After pressing PF4 the NCP will be reloaded. If both channel adapters are fully disabled (so A and B are disabled on both channel adapters) the 3705 will load the remote program loader programs from the (virtual) diskette.
 The below image shows the Control Panel channel section for a remote 3705:  
   
 ![LIB panel](/Images/CAs.png)   
@@ -310,7 +306,7 @@ The Control panel is updated after pressing any key, except the Home key.
 Exiting the Control panel: Press the Home key.  
 
 ### LIB panel
-The Line Interface Base (LIB) is the one place where all lines connect to.Each stand-alone emulator (3271,3274, DLSw, Trunk) has the -line switch as a mandatory start parameter to identify the line to which the connection should be made. Node that this line number must correspond to the line number in the NCP definition for the device being connected.   
+The Line Interface Base (LIB) is the one place where all lines connect to. Each stand-alone emulator (3271,3274, DLSw, Trunk) has the -line switch as a mandatory start parameter to identify the line to which the connection should be made. Node that this line number must correspond to the line number in the NCP definition for the device being connected.   
 
 A successful connection is identified by the message “LIB: 327x connected to line-xx”, whew xx is the line number.  
 
