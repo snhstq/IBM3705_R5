@@ -334,7 +334,7 @@ Line 22 shows connected (DSR and RI), but not active for VTAM.
 Line 23 is not connected and not active for VTAM.  
   
 ### 3274
-The i3274 component is an SDLC multi-drop IBM 3274 emulator. The default configuration consists of two 3274's, each capable of connection with 4 3270 emulators (like x3270 or tn3270).  
+The i3274 component is an SDLC multi-drop IBM 3274 emulator. The default i3274 code consists of two 3274's, each capable of connection with 4 3270 emulators (like x3270 or tn3270).  
 The 3274 is started from directory SIMH_3705_R5:
 ./BIN/i3274 -cchn efoxcc1 -line 20	
 -cchn is the hostname running your 3705. Line 20 is the SDLC line defined in the NCP. Instead of -cchn the IP address of your 3705 host can be specified with -ccip.   
@@ -361,7 +361,7 @@ NB: 3270 emulatures allow to specify the LU name. These allow to conect to a spe
 By default there are 4 LU's defined. so 03 is the highest. If you do not specyfy a LU name, the 3274 will select the first one available.   
 
 ### 3271
-The i3271 component is an BSC  multi-drop IBM 3271 emulator. The default configuration consists of two 3271's, each capable of connection with 4 3270 emulators (like x3270 or tn3270).  
+The i3271 component is an BSC  multi-drop IBM 3271 emulator. The default i3271 code consists of two 3271's, each capable of connection with 4 3270 emulators (like x3270 or tn3270).  
 The 3271 is started from directory SIMH_3705_R5:
 $ ./BIN/i3271 -cchn efoxcc1 -line 20	
 -cchn is the hostname running your 3705. Line 20 is the BSC line defined in the NCP. Instead of -cchn the IP address of your 3705 host can be specified with -ccip.  
