@@ -1,7 +1,7 @@
 # IBM3705_R5
 ## About the 3705 emulator project
 This project aims at delivering an IBM 3705-II emulator, specifically designed to connect to the Hercules mainframe emulator.  
-The 3705 emulator allows running unmodified IBM NCP software up to NCP version 3 (The last NCP version supporting a 3705-II). The package also includes a 3274 PU T2 emulator as well as a 3271 cluster emulator. This enables 3270 emulation software, like x3270 or tn3270,  to connect to the 3705 using the SLDC or BSC protocol. In addtion, it is even possible to connect actual IBM hardware to the 3705 emulator using a Data Link Switch (DLSw). 
+The 3705 emulator allows running unmodified IBM NCP software up to NCP version 3 (The last NCP version supporting a 3705-II). The package also includes a 3274 PU T2 emulator as well as a 3271 cluster emulator. This enables 3270 emulation software, like x3270 or tn3270,  to connect to the 3705 using the SLDC or BSC protocol. In addition, it is even possible to connect actual IBM hardware to the 3705 emulator using a Data Link Switch (DLSw). 
   
 ## Release Notes
 The main updates with Release 5 of the IBM 3705 SIMH emulator are:
@@ -15,10 +15,10 @@ The main updates with Release 5 of the IBM 3705 SIMH emulator are:
 3.  NModem has been renamed to Trunk. Trunk was IBM's original name for an SDLC connection between two 3705's. 
 4.  Control Panel:  
     Front Panel is renamed to Control Panel. The panel visualisation has been split from the main 3705 code. This panel visualization component runs in it's own xterm window, ensuring 
-    that messages comming out of the 3705 component remain visible. 
+    that messages coming out of the 3705 component remain visible. 
     The Control Panel is now equipped with a "Load" button which can be used to restart the 3705 without having to stop and start the emulator. 
 	A "disable" setting has been added to the channel A/B switches. By setting all Channel Adapters to disable and pressing the "Load" button, 
-	the 3705 loads the diskette with the Remeote Program Loader and therefor becomes a remote 3705. 
+	the 3705 loads the diskette with the Remote Program Loader and therefor becomes a remote 3705. 
 4.  RS232 rework:  
     The RS232 emulation has been significantly simplified and made more accurate. The DCE emulation is no longer located in the 3271 and 3274 emulation, but is now kept in the 3705 LIB.
     The RS232 signals are therefor no longer send across the TCP/IP connection to the 3271/3274
@@ -65,7 +65,7 @@ The package comes with the following components:
 All these "makes" commands should end without any issues.
 After a make, the executable is stored in the BIN directory.
 
-component 1 is madatory (duh...)
+component 1 is mandatory (duh...)
 The other components are optional, however, you must at least choose one of the components 2, 3 or 4.   
 
 Below picture shows the high-level architecture with all components.  
@@ -79,16 +79,16 @@ The 3705 is started from directory SIMH_3705_R5 with the command:
 $ ./BIN/i3705 3705-128k.cnf 
 
 3705-128k.cnf is the configuration file for a 128k channel attached 3705. Other config files available are: 3705-64k.cnf (64K 3705) and 3705-256k.cnf (256K 3705).  
-Similary, there are 3 configuration files for a remote 3705: 3705r-64k.cnf, 3705r-128k.cnf and 3705r-256k.cnf. 
+Similarly, there are 3 configuration files for a remote 3705: 3705r-64k.cnf, 3705r-128k.cnf and 3705r-256k.cnf. 
 
 After the start command the following messages appear:
 ```
-CS-T2: Thread 21095 started succesfully...
+CS-T2: Thread 21095 started successfully...
 CS-T2: Scanner initialized with 4 lines...
-CA-T2: Main thread 21094 started succesfully...
-PNL: Thread 21096 started succesfully... 
-LIB: Thread 21097 started succesfully...
-CA: Adapter thread 21093 started sucessfully... 
+CA-T2: Main thread 21094 started successfully...
+PNL: Thread 21096 started successfully... 
+LIB: Thread 21097 started successfully...
+CA: Adapter thread 21093 started successfully... 
 CA1: Waiting for channel connection on TCP port 37051 
 CA2: Waiting for channel connection on TCP port 37053 
 LIB: Using TCP network Address 192.168.2.71 on eth0 for 327x connections
@@ -109,7 +109,7 @@ CA1: New bus connection on 3705 port 37051, socket fd is 20, ip is : 192.168.2.1
 CA1: New tag connection on 3705 port 37051, socket fd is 21, ip is : 192.168.2.16, port : 49880 
 CA1: Connected to device 0660
 ```
-The last message indicates a succesful connection to Hercules device 660.   
+The last message indicates a successful connection to Hercules device 660.   
 The 3705 is now ready to be loaded with an NCP.   
 
 
@@ -200,7 +200,7 @@ Remove this module by deleting it from SYS1.LINKLIB.
 
 The original module is in dataset SYS1.SSPLIB, which has been added to the linklist and will be used from now on.   
 
-Note: the 'fake' IFLOADRN version is now not available anymore, meaning that it is no longer possibe to load the fake NCP's. 
+Note: the 'fake' IFLOADRN version is now not available anymore, meaning that it is no longer possible to load the fake NCP's. 
 
 Shutdown MVS and Re-IPL MVS with all these updates.
 
@@ -357,7 +357,7 @@ Press [RESET], followed by [CLEAR] and then again press [RESET].
 Now type: Logon applid(tso) logmode(mhp3278e)     
 press [SYSREQ]  (not [ENTER] !!!)  
 
-NB: 3270 emulatures allow to specify the LU name. These allow to conect to a specific LU. So, if you want to connect to the 2nd LU, specify LU 01 as the LU name in the 3274 emulator.   
+NB: 3270 emulatures allow to specify the LU name. These allow to connect to a specific LU. So, if you want to connect to the 2nd LU, specify LU 01 as the LU name in the 3274 emulator.   
 By default there are 4 LU's defined. so 03 is the highest. If you do not specyfy a LU name, the 3274 will select the first one available.   
 
 ### 3271
@@ -446,7 +446,7 @@ In effect, the connected state will allow the 3705 to send data across the line 
 
 DLSw can be terminated with 'Ctrl C'.
 
-DLSw can als be started in Full Duplex mode using the -fdx switch. Of course, the NCP line defintion must be defined as full duplex as well. The -line switch must specifie the lower line address of the two defined line addresses.
+DLSw can also be started in Full Duplex mode using the -fdx switch. Of course, the NCP line definition must be defined as full duplex as well. The -line switch must specifie the lower line address of the two defined line addresses.
 
 See section [Full Duplex](#full-duplex) for more details on Full Duplex.  
 
@@ -529,14 +529,14 @@ Note the addition "r" in the name of the config file.
 For the remote 3705 the following messages appear:
 
 ```
-CA-T2: Main thread 161535 started succesfully...
-CS-T2: Thread 161536 started succesfully...
+CA-T2: Main thread 161535 started successfully...
+CS-T2: Thread 161536 started successfully...
 CS-T2: Scanner initialized with 4 lines...
 CA1: Waiting for channel connection on TCP port 37051 
 CA2: Waiting for channel connection on TCP port 37053 
-LIB: Thread 161539 started succesfully...
-CA: Adapter thread 161534 started sucessfully... 
-PNL: Thread 161537 started succesfully... 
+LIB: Thread 161539 started successfully...
+CA: Adapter thread 161534 started successfully... 
+PNL: Thread 161537 started successfully... 
 LIB: Using TCP network Address 192.168.2.41 on eno1 for 327x connections
 LIB: Line-0 ready, waiting for connection on TCP port 37520
 LIB: Line-1 ready, waiting for connection on TCP port 37521
